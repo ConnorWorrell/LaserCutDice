@@ -18,7 +18,7 @@ TabDepth = BaseThickness+LaserRelief+TabDepthRelief;
 
 D10=false;
 D4=false;
-D4Pattern = [[1,2,4],[1,3,2],[1,4,2],[2,3,4]];
+D4Pattern = [[1,2,4],[1,3,2],[1,4,3],[2,3,4]];
 D4Offset = 4;
 
 Text = "1";
