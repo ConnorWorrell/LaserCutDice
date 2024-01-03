@@ -17,10 +17,14 @@ TabCount = 2; //Minimum 2 tabs
 TabDepth = BaseThickness+LaserRelief+TabDepthRelief;
 
 D10=false;
+D4=false;
+D4Pattern = [[1,2,4],[1,3,2],[1,4,2],[2,3,4]];
+D4Offset = 4;
 
 Text = "1";
+TextSizeOverride=0;
 TextRotation = D10==false?-360/(Sides*2)+90:0; //Always align text with an edge
-TextSize = InscribedDiameterInput*.254*(-1/Sides^2.5+1.5-2.5/Sides)*(D10==false?1:.5*InscribedDiameterInput/22.62741);
+TextSize = TextSizeOverride==0?InscribedDiameterInput*.254*(-1/Sides^2.5+1.5-2.5/Sides)*(D10==false?1:.5*InscribedDiameterInput/22.62741):TextSizeOverride;
 
 
 
@@ -31,7 +35,18 @@ translate([Offset,0,0])difference(){offset(r=LaserRelief,chamfer=false,$fn=30) p
     //Tile
 linear_extrude(BaseThickness) tile(r=InscribedDiameter/2, order=Sides, tabs=TabCount, tablength=TabDepth);
     //Text
+    if(D4 == false){
 projection(cut=false)linear_extrude(BaseThickness+TextThickness)rotate([0,0,TextRotation])text(Text, halign="center",valign="center", size=TextSize);
+    }
+    else{
+        //If text is even we do the right handed pattern, if it is odd we do the left handed pattern.
+        D4PatternToCut=D4Pattern[ord(Text)-49]; //-48 to convert to int, and -1 to change 1 to 0
+        echo(D4PatternToCut);
+
+        projection(cut=false)linear_extrude(BaseThickness+TextThickness)rotate([0,0,TextRotation])translate([0,D4Offset,0])text(str(D4PatternToCut[0]), halign="center",valign="center", size=TextSize);
+        projection(cut=false)linear_extrude(BaseThickness+TextThickness)rotate([0,0,TextRotation+120])translate([0,D4Offset,0])text(str(D4PatternToCut[1]), halign="center",valign="center", size=TextSize);
+        projection(cut=false)linear_extrude(BaseThickness+TextThickness)rotate([0,0,TextRotation+120*2])translate([0,3,0])text(str(D4PatternToCut[2]), halign="center",valign="center", size=TextSize);
+    }
 }
 
  module tile(order = 4, r=1, tabs=2, tablength=3){
@@ -57,7 +72,7 @@ projection(cut=false)linear_extrude(BaseThickness+TextThickness)rotate([0,0,Text
              //Generate tabs to remove
              for(tab=[0:1:tabs-1]){
                  echo(tab)
-                #polygon([firstPoint+parrVect*tab-perpVect-(tab==0&&!D10?parrVect:[0,0])+TabClearance*normSide, firstPoint+parrVect*tab+perpVect-(tab==0&&!D10?parrVect:[0,0])+TabClearance*normSide, firstPoint+parrVect*tab+perpVect+parrVect/2-TabClearance*normSide, 
+                polygon([firstPoint+parrVect*tab-perpVect-(tab==0&&!D10?parrVect:[0,0])+TabClearance*normSide, firstPoint+parrVect*tab+perpVect-(tab==0&&!D10?parrVect:[0,0])+TabClearance*normSide, firstPoint+parrVect*tab+perpVect+parrVect/2-TabClearance*normSide, 
         firstPoint+parrVect*tab+parrVect/2-perpVect-TabClearance*normSide]);
              }
         }
