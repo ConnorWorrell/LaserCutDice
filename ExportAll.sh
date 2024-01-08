@@ -6,3 +6,4 @@
 ./ExportD10.sh
 ./ExportD12.sh
 ./ExportD20.sh
+./ExportD6Skew.sh
